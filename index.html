@@ -481,9 +481,10 @@
     </div>
     <div>
       <!-- Form powered by FormSubmit — no signup needed. First submission sends a one-time activation email to steerittransport@gmail.com. -->
-      <form id="quoteForm" action="https://formsubmit.co/ajax/steerittransport@gmail.com" method="POST" enctype="multipart/form-data">
+      <form id="quoteForm" action="https://formsubmit.co/steerittransport@gmail.com" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_subject" value="New Quote Request — Steer It Transport">
         <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://steerittransport.com.au/?submitted=1">
         <div class="form-row">
           <div class="form-group"><label>Name</label><input type="text" name="name" placeholder="Your name" required autocomplete="name"></div>
           <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="your@email.com" required autocomplete="email"></div>
@@ -527,31 +528,15 @@
   }
   setInterval(() => goTo((current+1) % slides.length), 4500);
 
-  // Quote form — FormSubmit AJAX (supports file attachments)
-  document.getElementById('quoteForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn = this.querySelector('.form-submit');
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
-    try {
-      const res = await fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        headers: { 'Accept': 'application/json' }
-      });
-      const data = await res.json();
-      if (data.success === 'true' || data.success === true) {
-        this.style.display = 'none';
-        document.getElementById('formSuccess').style.display = 'block';
-      } else {
-        throw new Error();
-      }
-    } catch {
-      btn.disabled = false;
-      btn.textContent = 'Send Quote Request';
-      alert('Something went wrong. Please call or email us directly.');
+  // Quote form — show success message if redirected back after submission
+  if (window.location.search.includes('submitted=1')) {
+    const form = document.getElementById('quoteForm');
+    if (form) {
+      form.style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
     }
-  });
+    history.replaceState({}, document.title, window.location.pathname + '#contact');
+  }
 
   // Mobile nav hamburger
   const hamburger = document.getElementById('navHamburger');
